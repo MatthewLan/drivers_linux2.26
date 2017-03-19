@@ -4,9 +4,9 @@
 #include <linux/init.h>
 #include <linux/delay.h>
 #include <linux/device.h>
-#include <linux/io.h>
-#include <linux/uaccess.h>
+#include <asm/uaccess.h>
 #include <asm/irq.h>
+#include <asm/io.h>
 #include <asm/arch/regs-gpio.h>
 #include <asm/hardware.h>
 
