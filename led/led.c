@@ -4,6 +4,8 @@
 #include <linux/init.h>
 #include <linux/delay.h>
 #include <linux/device.h>
+#include <linux/io.h>
+#include <linux/uaccess.h>
 #include <asm/irq.h>
 #include <asm/arch/regs-gpio.h>
 #include <asm/hardware.h>
@@ -33,15 +35,41 @@ static struct class_device 	*led_class_devs;
 #define  LED_DEVICE_NODE		LED_NAME
 
 
+volatile unsigned long *gpfcon = NULL;
+volatile unsigned long *gpfdat = NULL;
+
+#define GPFCON_PHY_ADDR			0x56000050
+#define GPFCON_SIZE				16
+
+
 int led_open(struct inode *inode, struct file *file)
 {
-	printk("[led_open] called\n");
+	/* printk("[led_open] called\n");
+	 */
+	
+	/* GPF4,5,6 : output */
+	*gpfcon &= ~((0x3 << 8) | (0x3 << 10) | (0x3 << 12));
+	*gpfcon |= ((0x1 << 8) | (0x1 << 10) | (0x1 << 12));
+	
 	return 0;
 }
 
 ssize_t led_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 {
-	printk("[led_write] called\n");
+	int val = 0;
+	
+	/* printk("[led_write] called\n");
+	 */
+	
+	copy_from_user(&val, buf, count);
+	if (1 == val) {
+		/* turn on leds */
+		*gpfdat &= ~((1 << 4) | (1 << 5) | (1 << 6));
+	} else {
+		/* turn off leds */
+		*gpfdat |= ((1 << 4) | (1 << 5) | (1 << 6));
+	}
+	
 	return 0;
 }
 
@@ -72,6 +100,9 @@ static int __init led_init(void)
 		return PTR_ERR(led_class_devs);
 	}
 	
+	gpfcon = (unsigned long *)ioremap(GPFCON_PHY_ADDR, GPFCON_SIZE);
+	gpfdat = gpfcon + 1;
+	
 	return 0;
 }
 
@@ -81,6 +112,8 @@ static void __exit led_exit(void)
 	
 	class_device_unregister(led_class_devs);
 	class_destroy(led_class);
+	
+	iounmap(gpfcon);
 }
 
 module_init(led_init);
