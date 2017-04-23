@@ -46,21 +46,21 @@ int led_open(struct inode *inode, struct file *file)
 {
 	/* printk("[led_open] called\n");
 	 */
-	
+
 	/* GPF4,5,6 : output */
 	*gpfcon &= ~((0x3 << 8) | (0x3 << 10) | (0x3 << 12));
 	*gpfcon |= ((0x1 << 8) | (0x1 << 10) | (0x1 << 12));
-	
+
 	return 0;
 }
 
 ssize_t led_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos)
 {
 	int val = 0;
-	
+
 	/* printk("[led_write] called\n");
 	 */
-	
+
 	copy_from_user(&val, buf, count);
 	if (1 == val) {
 		/* turn on leds */
@@ -69,7 +69,7 @@ ssize_t led_write(struct file *file, const char __user *buf, size_t count, loff_
 		/* turn off leds */
 		*gpfdat |= ((1 << 4) | (1 << 5) | (1 << 6));
 	}
-	
+
 	return 0;
 }
 
@@ -85,12 +85,12 @@ static int __init led_init(void)
 	/* register_chrdev(LED_MAJOR, LED_DEVICE_NAME, &led_fos);
 	 */
 	led_major = register_chrdev(0, LED_DEVICE_NAME, &led_fos);
-	
+
 	led_class = class_create(THIS_MODULE, LED_DEVICE_CLASS);
 	if (IS_ERR(led_class)) {
 		return PTR_ERR(led_class);
 	}
-	
+
 	led_class_devs = class_device_create(led_class, \
 											NULL, \
 											MKDEV(led_major, 0), \
@@ -99,20 +99,20 @@ static int __init led_init(void)
 	if (unlikely(IS_ERR(led_class_devs))) {
 		return PTR_ERR(led_class_devs);
 	}
-	
+
 	gpfcon = (unsigned long *)ioremap(GPFCON_PHY_ADDR, GPFCON_SIZE);
 	gpfdat = gpfcon + 1;
-	
+
 	return 0;
 }
 
 static void __exit led_exit(void)
 {
 	unregister_chrdev(led_major, LED_DEVICE_NAME);
-	
+
 	class_device_unregister(led_class_devs);
 	class_destroy(led_class);
-	
+
 	iounmap(gpfcon);
 }
 
