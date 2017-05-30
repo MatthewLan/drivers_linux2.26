@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 	}
 
 	while (1) {
-		read(fd, key_val, sizeof(key_val));
+		read(fd, &key_val, sizeof(key_val));
 		printf("key_val: %x\n", key_val);
 	}
 
