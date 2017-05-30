@@ -15,6 +15,7 @@ int main(int argc, char **argv)
 	fd = open("/dev/button", O_RDWR);
 	if (fd < 0) {
 		printf("can't open!!!\n");
+		return -1;
 	}
 
 	fds[0].fd = fd;
