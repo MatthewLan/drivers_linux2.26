@@ -166,6 +166,11 @@ static int __init nand_flash_init(void)
 
 static void __exit nand_flash_exit(void)
 {
+#if 1
+    del_mtd_partitions(nandflash_info);
+#else
+    del_mtd_device(nandflash_info);
+#endif
     kfree(nandflash_info);
     iounmap(nandflash_regs);
     kfree(nandflash_chip);
