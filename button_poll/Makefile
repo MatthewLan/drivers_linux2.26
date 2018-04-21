@@ -1,4 +1,4 @@
-KERNEL_DIR = /home/fedora/JZ2440V3/linux/linux-2.6.22.6
+KERNEL_DIR = /home/matthew/JZ2440V3/linux/linux-2.6.22.6
 
 all:
 	make -C ${KERNEL_DIR} M=`pwd` modules

@@ -86,7 +86,7 @@ static int led_probe(struct platform_device *pdev)
 
 static int led_remove(struct platform_device *pdev)
 {
-    class_device_unregister(led_class_devs);
+    class_device_destroy(led_class, MKDEV(led_major, 0));
     class_destroy(led_class);
     unregister_chrdev(led_major, "jz2440_led");
     iounmap(gpio_con);
